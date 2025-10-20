@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend Documentation
+
+This document provides a comprehensive overview of the frontend architecture, setup instructions, and key components.
+
+## Overview
+
+The frontend is a Next.js application responsible for providing a user-friendly chat interface for the RAG agent. It communicates with the backend via a dedicated API service, handles streaming responses, and offers a clean, responsive UI.
+
+## Folder Structure
+
+The frontend is organized into the following directories:
+
+-   **/app**: Contains the core application logic, including routing and API definitions.
+    -   **/api/chat**: The API route that proxies requests to the backend.
+-   **/components**: Reusable UI components.
+    -   **Chat.tsx**: The main chat interface component.
+-   **/services**: Handles communication with external APIs.
+    -   **chatService.ts**: The service responsible for making requests to the backend.
+-   **/public**: Static assets, such as images and fonts.
 
 ## Getting Started
 
-First, run the development server:
+To run the frontend locally, follow these steps:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1.  **Install Dependencies**:
+    Navigate to the `frontend` directory and install the required packages.
+    ```bash
+    npm install
+    ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2.  **Environment Variables**:
+    Create a `.env.local` file in the `frontend` directory and add the following:
+    ```
+    BACKEND_URL=http://localhost:3001/api/chat
+    ```
+    Replace the URL with your actual backend endpoint if it differs.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3.  **Run the Development Server**:
+    ```bash
+    npm run dev
+    ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The application will be available at `http://localhost:3000`.
 
-## Learn More
+## Architecture
 
-To learn more about Next.js, take a look at the following resources:
+The frontend follows a modular architecture that separates concerns and promotes code reusability.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+-   **API Abstraction**: The `chatService.ts` module abstracts all backend communication, making it easy to manage API calls from a single location.
+-   **Component-Based UI**: The UI is built with React components, with `Chat.tsx` serving as the primary interface. This component manages state, handles user input, and displays messages.
+-   **Streaming Responses**: The application is designed to handle streaming responses from the backend, allowing for real-time updates to the chat interface as the RAG agent processes information.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This structure ensures that the frontend is maintainable, scalable, and easy to debug.

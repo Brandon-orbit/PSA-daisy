@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
+import { sendMessage as sendChatMessage } from "../services/chatService"; // Renamed import to avoid conflict
 
 interface Message {
   role: "user" | "assistant";
@@ -32,39 +33,67 @@ export default function Chat() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!input.trim()) return;
 
     const userMessage: Message = { role: "user", content: input };
     setMessages((prev) => [...prev, userMessage]);
+    const currentInput = input;
     setInput("");
     setLoading(true);
 
-    // Mock streaming response
-    const mockResponse = "This project is still in the kitchen.";
-    let index = 0;
-
-    const interval = setInterval(() => {
-      if (index < mockResponse.length) {
-        setMessages((prev) => {
-          const updated = [...prev];
-          const last = updated[updated.length - 1];
-          if (last.role === "assistant") {
-            updated[updated.length - 1] = {
-              role: "assistant",
-              content: last.content + mockResponse[index],
-            };
-          } else {
-            updated.push({ role: "assistant", content: mockResponse[index] });
-          }
-          return updated;
-        });
-        index++;
-      } else {
-        clearInterval(interval);
-        setLoading(false);
+    try {
+      const stream = await sendChatMessage(currentInput);
+      if (!stream) {
+        throw new Error("No response stream from the server.");
       }
-    }, 20);
+
+      const reader = stream.getReader();
+      const decoder = new TextDecoder();
+
+      // Function to process the stream
+      const processStream = async () => {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) {
+            setLoading(false);
+            break;
+          }
+
+          const chunk = decoder.decode(value, { stream: true });
+
+          setMessages((prev) => {
+            const updated = [...prev];
+            const last = updated[updated.length - 1];
+
+            if (last?.role === "assistant") {
+              // Append to the existing assistant message
+              updated[updated.length - 1] = {
+                ...last,
+                content: last.content + chunk,
+              };
+            } else {
+              // Start a new assistant message
+              updated.push({ role: "assistant", content: chunk });
+            }
+            return updated;
+          });
+        }
+      };
+
+      await processStream();
+
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Sorry, I encountered an error. Please try again.",
+        },
+      ]);
+      setLoading(false);
+    }
   };
 
   return (
