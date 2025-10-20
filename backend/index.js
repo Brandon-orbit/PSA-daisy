@@ -1,25 +1,23 @@
-// Import the Express library to create and manage the server
+// This is the main entry point for the backend application.
+// It sets up the Express server, configures middleware, and connects the API routes.
+
 import express from 'express';
-// Import the API routes for the application
 import apiRoutes from './src/api/routes.js';
 
-// Create an instance of an Express application
+// Creating a new Express application.
 const app = express();
-// Define the port the server will listen on, defaulting to 3000
+
+// Defining the port the server will listen on. It will use the PORT environment variable if available, otherwise it will default to 3000.
 const port = process.env.PORT || 3000;
 
-// Use Express's built-in middleware to parse JSON bodies of incoming requests
+// Middleware to parse incoming JSON requests. This is needed to read the body of POST requests.
 app.use(express.json());
 
-// Mount the API routes at the /api/v1 path
-app.use('/api/v1', apiRoutes);
+// Mounting the API routes under the /api path.
+// All routes defined in routes.js will be prefixed with /api.
+app.use('/api', apiRoutes);
 
-// Define a simple route for the root of the application
-app.get('/', (req, res) => {
-  res.send('Welcome to the Power BI RAG Data Extraction API');
-});
-
-// Start the server and have it listen on the specified port
+// Starting the server and listening for incoming connections on the specified port.
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

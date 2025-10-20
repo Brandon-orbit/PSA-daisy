@@ -1,71 +1,37 @@
-// Import the PipelineService to run the data extraction and indexing process
-import PipelineService from '../services/pipeline.js';
-import OpenAIService from '../services/openai.js';
+// This file is the controller for the Power BI API.
+// It handles the incoming HTTP requests and calls the appropriate service functions to process them.
+
+import { getAccessToken, executeDaxQuery } from '../services/powerbi.js';
+import config from '../config/config.js';
 
 /**
- * @function runPipeline
- * @description Controller for the /extract-and-index route.
- * This function creates a new instance of the PipelineService and uses it to
- * run the data processing pipeline with the parameters from the request body.
- * @param {object} req - The request object from Express.
- * @param {object} res - The response object from Express.
+ * Handles the DAX query request. It gets an access token, executes the query, and sends the results back to the client.
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object.
  */
-export const runPipeline = async (req, res) => {
+async function handleDaxQuery(req, res) {
+  // Extracting the dataset ID and DAX query from the request body.
+  const { datasetId, daxQuery } = req.body;
+
+  // Basic validation to ensure the required parameters are present.
+  if (!datasetId || !daxQuery) {
+    return res.status(400).json({ error: 'datasetId and daxQuery are required' });
+  }
+
   try {
-    // Extract the dataset ID and DAX queries from the request body
-    const { datasetId, daxQueries } = req.body;
+    // Step 1: Get an access token for the Power BI API.
+    const accessToken = await getAccessToken();
 
-    // Check for missing parameters and return an error if they are not provided
-    if (!datasetId || !daxQueries) {
-      return res.status(400).json({ error: 'Missing datasetId or daxQueries' });
-    }
+    // Step 2: Execute the DAX query using the access token.
+    const result = await executeDaxQuery(datasetId, daxQuery, accessToken);
 
-    // Create a new instance of the pipeline service and run it
-    const pipeline = new PipelineService();
-    const result = await pipeline.run(datasetId, daxQueries);
-
-    // Send the result of the pipeline back as the response
+    // Step 3: Send the query results back to the client with a 200 OK status.
     res.status(200).json(result);
   } catch (error) {
-    // If an error occurs, log it and send a 500 server error response
-    console.error('Error running pipeline:', error);
-    res.status(500).json({ error: 'Failed to run pipeline', details: error.message });
+    // If any error occurs during the process, send a 500 Internal Server Error status with the error message.
+    res.status(500).json({ error: error.message });
   }
-};
+}
 
-/**
- * @function healthCheck
- * @description Controller for the /health route.
- * This function returns a simple JSON object to indicate that the service is
- * running and healthy.
- * @param {object} req - The request object from Express.
- * @param {object} res - The response object from Express.
- */
-export const healthCheck = (req, res) => {
-  // Respond with a status of 'healthy'
-  res.status(200).json({ status: 'healthy', service: 'Power BI RAG Extraction API' });
-};
-
-/**
- * @function askAI
- * @description Controller for the /ask-ai route.
- * @param {object} req - The request object from Express.
- * @param {object} res - The response object from Express.
- */
-export const askAI = async (req, res) => {
-  try {
-    const { prompt } = req.body;
-
-    if (!prompt) {
-      return res.status(400).json({ error: 'Missing prompt' });
-    }
-
-    const openai = new OpenAIService();
-    const result = await openai.getCompletion(prompt);
-
-    res.status(200).json({ response: result });
-  } catch (error) {
-    console.error('Error asking AI:', error);
-    res.status(500).json({ error: 'Failed to ask AI', details: error.message });
-  }
-};
+// Exporting the handler function for use in the routes file.
+export { handleDaxQuery };

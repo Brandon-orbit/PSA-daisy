@@ -33,7 +33,7 @@ AZURE_OPENAI_API_KEY=<your-openai-api-key>
 To install the necessary dependencies, run the following command in the `backend` directory:
 
 ```bash
-npm install
+npm install express
 ```
 
 ## Running the Application
@@ -45,6 +45,20 @@ node index.js
 ```
 
 The server will be available at `http://localhost:3000`.
+
+## API Endpoints
+
+### Execute DAX Query
+
+* **URL:** `/api/powerbi/query`
+* **Method:** `POST`
+* **Body:**
+  ```json
+  {
+    "datasetId": "<your-dataset-id>",
+    "daxQuery": "<your-dax-query>"
+  }
+  ```
 
 ## Folder Structure
 

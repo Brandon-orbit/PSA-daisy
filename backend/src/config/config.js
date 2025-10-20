@@ -1,39 +1,38 @@
-// Import the 'dotenv' library to load environment variables from a .env file
-import 'dotenv/config';
+// The purpose of this file is to load environment variables from a .env file and export them for use throughout the application.
+// Using a centralized configuration file makes it easier to manage and update settings without hardcoding them in multiple places.
 
-/**
- * @description Configuration object for the application.
- * This object holds all the environment variables for the application.
- * It's structured to group related settings together.
- */
+import dotenv from 'dotenv';
+
+// This line loads the environment variables from the .env file in the root of the backend directory.
+dotenv.config();
+
+// The config object holds all the environment variables that are used in the application.
+// This makes it easy to access them from a single, consistent source.
 const config = {
-  // Power BI related configuration
-  powerBI: {
-    clientId: process.env.CLIENT_ID, // The client ID for the Power BI application
-    clientSecret: process.env.CLIENT_SECRET, // The client secret for the Power BI application
-    tenantId: process.env.TENANT_ID, // The tenant ID for the Azure Active Directory
-    workspaceId: process.env.WORKSPACE_ID, // The workspace ID for the Power BI workspace
-    reportId: process.env.REPORT_ID, // The report ID for the Power BI report
+  // Power BI configuration details, used for authenticating and interacting with the Power BI API.
+  powerbi: {
+    clientId: process.env.CLIENT_ID, // The client ID of the Azure AD application.
+    clientSecret: process.env.CLIENT_SECRET, // The client secret of the Azure AD application.
+    tenantId: process.env.TENANT_ID, // The tenant ID of the Azure AD directory.
+    workspaceId: process.env.WORKSPACE_ID, // The ID of the Power BI workspace.
+    reportId: process.env.REPORT_ID, // The ID of the Power BI report.
   },
-  // Azure Storage related configuration
-  azureStorage: {
-    accountName: process.env.STORAGE_ACCOUNT_NAME, // The name of the Azure Storage account
-    accountKey: process.env.STORAGE_ACCOUNT_KEY, // The key for the Azure Storage account
-    containerName: process.env.STORAGE_CONTAINER_NAME || 'powerbi-rag-data', // The name of the container in the storage account, with a default value
+  // Azure Storage configuration details, used for storing and accessing data.
+  azure: {
+    storageAccountName: process.env.STORAGE_ACCOUNT_NAME, // The name of the Azure Storage account.
+    storageAccountKey: process.env.STORAGE_ACCOUNT_KEY, // The access key for the Azure Storage account.
+    storageContainerName: process.env.STORAGE_CONTAINER_NAME, // The name of the container within the storage account.
   },
-  // Azure AI Search related configuration
-  azureSearch: {
-    serviceName: process.env.SEARCH_SERVICE_NAME, // The name of the Azure AI Search service
-    adminKey: process.env.SEARCH_ADMIN_KEY, // The admin key for the Azure AI Search service
-    indexName: process.env.SEARCH_INDEX_NAME || 'powerbi-rag-index', // The name of the index in the search service, with a default value
+  // Azure AI Search configuration details, used for indexing and querying data.
+  search: {
+    serviceName: process.env.SEARCH_SERVICE_NAME, // The name of the Azure AI Search service.
+    adminKey: process.env.SEARCH_ADMIN_KEY, // The admin key for the search service.
+    indexName: process.env.SEARCH_INDEX_NAME, // The name of the search index.
   },
-  // Azure OpenAI related configuration
-  azureOpenAI: {
-    apiKey: process.env.AZURE_OPENAI_API_KEY, // The API key for the Azure OpenAI service
-    baseUrl: "https://psacodesprint2025.azure-api.net/openai/deployments/gpt-4.1-nano", // The base URL for the OpenAI API
-    apiVersion: "2025-01-01-preview", // The version of the OpenAI API
-  }
+  // Azure OpenAI configuration details, used for interacting with the OpenAI API.
+  openai: {
+    apiKey: process.env.AZURE_OPENAI_API_KEY, // The API key for the Azure OpenAI service.
+  },
 };
 
-// Export the configuration object to be used in other parts of the application
 export default config;
