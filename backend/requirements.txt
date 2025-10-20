@@ -1,8 +1,0 @@
-fastapi
-uvicorn[standard]
-requests
-azure-identity
-azure-storage-blob
-pandas
-pyarrow
-pydantic-settings
